@@ -57,13 +57,18 @@ def main():
     )
 
     st.markdown(
-        "Check if your website's SSL certificate is about to expire. Stay secure by renewing certificates on time!")
+        "Check if your website's SSL certificate is about to expire. Stay secure by renewing certificates on time!"
+    )
 
     with st.expander("ℹ️ Instructions"):
-        st.write("Enter the hostnames of the websites you want to check, one per line. Click 'Check Expiry' to see the results.")
+        st.write(
+            "Enter the hostnames of the websites you want to check, one per line. Click 'Check Expiry' to see the results."
+        )
 
-    host_input = st.text_area("Enter hostnames (one per line):",
-                              "google.com\nredbus.com\nfacebook.com\nudemy.com\nstreamlit.io")
+    host_input = st.text_area(
+        "Enter hostnames (one per line):",
+        "google.com\nredbus.com\nfacebook.com\nudemy.com\nstreamlit.io",
+    )
 
     if st.button("Check Expiry"):
         hosts = host_input.strip().split("\n")
@@ -75,19 +80,23 @@ def main():
             progress.progress((i + 1) / len(hosts))
 
         st.subheader("Results")
-        df = pd.DataFrame(results, columns=[
-                          "Hostname", "Days Until Expiry", "Status", "Issuer"])
+        df = pd.DataFrame(
+            results, columns=["Hostname", "Days Until Expiry", "Status", "Issuer"]
+        )
         st.table(df)
 
         st.markdown("### Expiry Status Chart")
         chart = alt.Chart(df).mark_bar().encode(
-            x='Hostname',
-            y='Days Until Expiry',
-            color=alt.Color('Status', scale=alt.Scale(
-                domain=['Expired', 'Expiring Soon', 'Valid'],
-                range=['#dc3545', '#ffc107', '#28a745']
-            )),
-            tooltip=['Hostname', 'Days Until Expiry', 'Status', 'Issuer']
+            x="Hostname",
+            y="Days Until Expiry",
+            color=alt.Color(
+                "Status",
+                scale=alt.Scale(
+                    domain=["Expired", "Expiring Soon", "Valid"],
+                    range=["#dc3545", "#ffc107", "#28a745"],
+                ),
+            ),
+            tooltip=["Hostname", "Days Until Expiry", "Status", "Issuer"],
         ).properties(width=700, height=400)
 
         st.altair_chart(chart, use_container_width=True)
@@ -95,14 +104,11 @@ def main():
         st.markdown("### Alerts")
         for host, days_left, status, issuer in results:
             if status == "Expired":
-                st.error(f"❌ {host} has expired {
-                         abs(days_left)} days ago. Issuer: {issuer}")
+                st.error(f"❌ {host} has expired {abs(days_left)} days ago. Issuer: {issuer}")
             elif status == "Expiring Soon":
-                st.warning(f"⚠️ {host} is expiring in {
-                           days_left} days. Issuer: {issuer}")
+                st.warning(f"⚠️ {host} is expiring in {days_left} days. Issuer: {issuer}")
             else:
-                st.success(f"✅ {host} is valid for {
-                           days_left} more days. Issuer: {issuer}")
+                st.success(f"✅ {host} is valid for {days_left} more days. Issuer: {issuer}")
 
 
 if __name__ == "__main__":
